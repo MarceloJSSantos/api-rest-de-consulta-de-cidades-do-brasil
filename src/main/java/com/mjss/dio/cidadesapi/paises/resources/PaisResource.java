@@ -2,6 +2,8 @@ package com.mjss.dio.cidadesapi.paises.resources;
 
 import com.mjss.dio.cidadesapi.paises.entitys.Pais;
 import com.mjss.dio.cidadesapi.paises.repositorys.PaisRepository;
+import com.mjss.dio.cidadesapi.paises.services.PaisService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,32 +19,23 @@ import java.util.Scanner;
 
 @RestController
 @RequestMapping("/paises")
+@AllArgsConstructor(onConstructor = @__(@Autowired))
 public class PaisResource {
 
-    //@Autowired (usado o construtor abaixo)
-    private PaisRepository repository;
-
-    public PaisResource(PaisRepository repository) {
-        this.repository = repository;
-    }
+    private final PaisService paisService;
 
     @GetMapping
     public List<Pais> paises(){
-        return repository.findAll();
+        return paisService.listaPaises();
     }
 
     @GetMapping("/paginado")
     public Page<Pais> paisesPaginado(Pageable page){
-        return  repository.findAll(page);
+        return  paisService.paginaPaises(page);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity paisPorId(@PathVariable Long id){
-        Optional<Pais> optionalPais = repository.findById(id);
-        if(optionalPais.isPresent()){
-            return ResponseEntity.ok().body(optionalPais.get());
-        } else{
-            return ResponseEntity.notFound().build();
-        }
+        return paisService.paisPorId(id);
     }
 }
